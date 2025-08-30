@@ -1,59 +1,55 @@
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-void print_set(int *tab, int size)
+
+void print_table(int *res , int len)
 {
     int i = 0;
-    while (i < size)
+    while (i < len)
     {
-        printf("%d", tab[i]);
-        i++;
-    if ( i < size)
+        printf("%d", res[i]);
+        if (i != len - 1)
             printf(" ");
+        i++;
     }
     printf("\n");
 }
 
-void find_subsets(int *tab, int size, int target, int index, int *subset, int subset_size, int current_sum)
+void    powerset(int i, int size, int target, int *res, int *tab, int len)
 {
-    if (index == size)
+    if (size == i)
     {
-        if (current_sum == target)
-            print_set(subset, subset_size);
-        return;
+        int sum = 0;
+        int j = 0;
+        while (j < len)
+        {
+            sum += res[j];
+            j++;
+        }
+        if (sum == target)
+            print_table(res, len);
+        return ;
     }
-
-    find_subsets(tab, size, target, index + 1, subset, subset_size, current_sum);
-    
-    subset[subset_size] = tab[index];
-    find_subsets(tab, size, target, index + 1, subset, subset_size + 1, current_sum + tab[index]);
+    res[len] = tab[i];
+    powerset(i + 1, size, target, res, tab, len + 1);
+    powerset(i + 1, size, target, res, tab, len);
 }
 
-void powerset(int *tab, int size, int target)
-{
-    int *subset = malloc(sizeof(int) * size);
-    find_subsets(tab, size, target, 0, subset, 0, 0);
-    free(subset);
-}
-
-int main(int ac, char **av)
+int main (int ac , char **av)
 {
     if (ac < 3)
         return 1;
-
     int target = atoi(av[1]);
-    int n = ac - 2;
-
-    int *tab = malloc(sizeof(int) * n);
+    int tab[ac - 2];
     int i = 0;
-    while (i < n)
+    while (i < ac - 2)
     {
         tab[i] = atoi(av[i + 2]);
         i++;
     }
-
-    powerset(tab, n, target);
-    free(tab);
-
+    int *res = malloc(sizeof(int) * (ac - 2));
+    if (!res)
+        return 1;
+    powerset(0 , ac - 2, target, res, tab, 0);
+    free(res);
     return 0;
 }
